@@ -1,0 +1,44 @@
+unit uDataModule;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FMX.Types, FMX.Controls, System.ImageList,
+  FMX.ImgList;
+
+type
+  TDataModule1 = class(TDataModule)
+    stylebookOxfordBlue: TStyleBook;
+    imgListNavBar: TImageList;
+    stylebookBlackPearl: TStyleBook;
+  private
+    { Private declarations }
+  public
+    procedure SaveSettingString(Section, Name, Value: string);
+    function LoadSettingString(Section, Name, Value: string): string;
+  end;
+
+var
+  DataModule1: TDataModule1;
+  ActiveServer: string;
+  ActiveStyle: TStyleBook;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
+
+{ TDataModule1 }
+
+function TDataModule1.LoadSettingString(Section, Name, Value: string): string;
+begin
+
+end;
+
+procedure TDataModule1.SaveSettingString(Section, Name, Value: string);
+begin
+
+end;
+
+end.

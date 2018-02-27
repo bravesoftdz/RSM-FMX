@@ -1,0 +1,35 @@
+unit uDescriptionEditor;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, uDataModule,
+  FMX.Controls.Presentation, FMX.StdCtrls;
+
+type
+  TfrmDescriptionEditor = class(TForm)
+    pnlBottom: TPanel;
+    pnlRight: TPanel;
+    btnSave: TButton;
+    btnClose: TButton;
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDescriptionEditor: TfrmDescriptionEditor;
+
+implementation
+
+{$R *.fmx}
+
+procedure TfrmDescriptionEditor.FormShow(Sender: TObject);
+begin
+  frmDescriptionEditor.StyleBook := Style;
+end;
+
+end.

@@ -1,0 +1,6 @@
+{
+  "Message": "[\r\n  {\r\n    \"SteamID\": \"76561198113034550\",\r\n    \"OwnerSteamID\": \"0\",\r\n    \"DisplayName\": \"[SEXBOY] Quantum\",\r\n    \"Ping\": 25,\r\n    \"Address\": \"197.88.20.83:57053\",\r\n    \"ConnectedSeconds\": 1114,\r\n    \"VoiationLevel\": 0.0,\r\n    \"CurrentLevel\": 0.0,\r\n    \"UnspentXp\": 0.0,\r\n    \"Health\": 86.83243\r\n  }\r\n]",
+  "Identifier": 0,
+  "Type": "Generic",
+  "Stacktrace": ""
+}

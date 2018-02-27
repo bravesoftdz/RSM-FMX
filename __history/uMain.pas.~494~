@@ -1,0 +1,669 @@
+unit uMain;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, uDataModule,
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.MultiView, FMX.Layouts, FMX.ListBox,
+  FMX.Objects, FMX.TabControl, FMX.ScrollBox, FMX.Memo, FMX.Menus, FMX.ExtCtrls,
+  FMX.MagnifierGlass, FMX.Edit, FMX.Effects, ipecore, ipewebsocketclient, FMX.Filter.Effects,
+  IniFiles, uDescriptionEditor, System.Rtti, FMX.Grid.Style, FMX.Grid, FMX.Clipboard,
+  FMX.EditBox, FMX.ComboTrackBar, FMX.ComboEdit, IdBaseComponent, IdComponent,
+  IdTCPConnection, IdTCPClient, IdHTTP;
+
+type
+  TfrmMain = class(TForm)
+    pnlHead: TPanel;
+    lblHeading: TLabel;
+    multiViewNav: TMultiView;
+    grdpnlyt1: TGridPanelLayout;
+    btnMasterButton: TSpeedButton;
+    lst1: TListBox;
+    lstItemServerConfig: TListBoxItem;
+    lstItemServerInstaller: TListBoxItem;
+    lstItemPluginManager: TListBoxItem;
+    layoutServerConfig: TLayout;
+    layoutServerInstaller: TLayout;
+    layoutPluginManager: TLayout;
+    lblpluginmanager: TLabel;
+    layoutInstallerLog: TLayout;
+    mmoServerInstaller: TMemo;
+    lstItemSettings: TListBoxItem;
+    layoutSettings: TLayout;
+    pnl1: TPanel;
+    btnStartServer: TButton;
+    btnSaveConfig: TButton;
+    grpStyles: TGroupBox;
+    cbbStyles: TComboBox;
+    lblHostname: TLabel;
+    edtHostname: TEdit;
+    btnClearHostname: TClearEditButton;
+    lblDescription: TLabel;
+    lstItemWebRcon: TListBoxItem;
+    layoutWebRcon: TLayout;
+    lbl1: TLabel;
+    websocketclientRcon: TipeWebSocketClient;
+    stat1: TStatusBar;
+    lbl5: TLabel;
+    grpFormQuality: TGroupBox;
+    cbbFormQuality: TComboBox;
+    edtServerDescription: TEdit;
+    btnOpenDescriptionEditor: TEllipsesEditButton;
+    tbcWebRcon: TTabControl;
+    tbConsole: TTabItem;
+    pnl2: TPanel;
+    btnWebRconSend: TButton;
+    edtWebRconSend: TEdit;
+    pnl3: TPanel;
+    lbl2: TLabel;
+    grdpnlyt3: TGridPanelLayout;
+    btnAddSavedCommand: TSpeedButton;
+    btnRemoveSavedCommand: TSpeedButton;
+    lstSavedCommands: TListBox;
+    btnWebRconConnect: TButton;
+    btnWebRconDisconnect: TButton;
+    mmoWebRcon: TMemo;
+    tbSettings: TTabItem;
+    grpWebRconMisc: TGroupBox;
+    chkAutoScroll: TCheckBox;
+    chkSendOnEnter: TCheckBox;
+    chkWordWrap: TCheckBox;
+    chkWebRconDebugMode: TCheckBox;
+    grpWebRconConnection: TGroupBox;
+    lbl3: TLabel;
+    edtWebRconIP: TEdit;
+    btnWebRcon_ClearIP: TClearEditButton;
+    lbl4: TLabel;
+    edtWebRconPassword: TEdit;
+    btnWebRcon_ShowPass: TPasswordEditButton;
+    btnWebRcon_SaveConnection: TButton;
+    websocketclientPlayers: TipeWebSocketClient;
+    tbPlayers: TTabItem;
+    btnRefreshPlayers: TButton;
+    lstPlayers: TListBox;
+    tmrWebSockerPlayersDC: TTimer;
+    lstBoxHeaderDisplayName: TListBoxGroupHeader;
+    lstBoxHeaderSteamID: TListBoxGroupHeader;
+    lstBoxHeaderAddress: TListBoxGroupHeader;
+    lstBoxHeaderConnectedFor: TListBoxGroupHeader;
+    lstBoxHeaderPing: TListBoxGroupHeader;
+    lstBoxHeaderHealth: TListBoxGroupHeader;
+    layoutDevBlogs: TLayout;
+    lstDevBlog: TListBox;
+    lstItemDevBlog: TListBoxItem;
+    pnl4: TPanel;
+    lbl6: TLabel;
+    btnRefreshDevblog: TSpeedButton;
+    lstItem1: TListBoxItem;
+    mmoDevDebug: TMemo;
+    procedure lst1Change(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure cbbStylesChange(Sender: TObject);
+    procedure LogRcon(LogText: string);
+    procedure websocketclientRconConnectionStatus(Sender: TObject; const ConnectionEvent: string; StatusCode: Integer; const Description: string);
+    procedure websocketclientRconError(Sender: TObject; ErrorCode: Integer; const Description: string);
+    procedure btnWebRconConnectClick(Sender: TObject);
+    procedure mmoWebRconChange(Sender: TObject);
+    function ParseData(Data: string): string;
+    procedure websocketclientRconDataIn(Sender: TObject; DataFormat: Integer; Text: string; EOM: Boolean);
+    procedure btnWebRconDisconnectClick(Sender: TObject);
+    procedure Cleanup;
+    procedure edtWebRconSendKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
+    procedure btnWebRconSendClick(Sender: TObject);
+    procedure WebRconSend(Command: string);
+    function ParseCommand(Command: string): string;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure chkWordWrapChange(Sender: TObject);
+    procedure cbbFormQualityChange(Sender: TObject);
+    procedure SaveSettingString(Section, Name, Value: string);
+    procedure SaveSettingBool(Section, Name: string; Value: Boolean);
+    procedure SaveSettingInteger(Section, Name: string; Value: Integer);
+    procedure SaveSettingFloat(Section, Name: string; Value: Real);
+    function LoadSettingString(Section, Name, Value: string): string;
+    function LoadSettingBool(Section, Name: string; Value: Boolean): Boolean;
+    function LoadSettingInteger(Section, Name: string; Value: Integer): Integer;
+    function LoadSettingFloat(Section, Name: string; Value: Real): Real;
+    procedure btnWebRcon_SaveConnectionClick(Sender: TObject);
+    procedure chkAutoScrollChange(Sender: TObject);
+    procedure chkSendOnEnterChange(Sender: TObject);
+    procedure LoadAllSettings;
+    procedure btnOpenDescriptionEditorClick(Sender: TObject);
+    procedure GetPlayers(Data: string);
+    procedure websocketclientPlayersDataIn(Sender: TObject; DataFormat: Integer; Text: string; EOM: Boolean);
+    procedure btnRefreshPlayersClick(Sender: TObject);
+    procedure websocketclientPlayersConnected(Sender: TObject; StatusCode: Integer; const Description: string);
+    procedure tmrWebSockerPlayersDCTimer(Sender: TObject);
+    procedure websocketclientPlayersDisconnected(Sender: TObject; StatusCode: Integer; const Description: string);
+    procedure btnAddSavedCommandClick(Sender: TObject);
+    procedure btnRemoveSavedCommandClick(Sender: TObject);
+    procedure lstSavedCommandsDblClick(Sender: TObject);
+    procedure GetRustDevblog;
+    procedure btnRefreshDevblogClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+const
+  // Files
+  RSM_CONFIG_FILE = '.\RSM\RSM-Config.ini';
+  WEBRCON_SAVEDCOMMANDS = '.\RSM\WebRconCommands.txt';
+  // WebRcon PlayerList
+  PLAYER_HEADERS: array[1..6] of string = ('Display Name', 'SteamID', 'Address', 'Connected For', 'Ping (ms)', 'Health');
+
+var
+  frmMain: TfrmMain;
+
+implementation
+
+uses
+  djson;
+
+{$R *.fmx}
+
+procedure TfrmMain.btnRefreshDevblogClick(Sender: TObject);
+begin
+  GetRustDevblog;
+end;
+
+procedure TfrmMain.btnRefreshPlayersClick(Sender: TObject);
+begin
+  if not (Trim(edtWebRconIP.Text) = Null) or (Trim(edtWebRconPassword.Text) = Null) then
+  begin
+    websocketclientPlayers.Connect('ws://' + edtWebRconIP.Text + '/' + edtWebRconPassword.Text);
+
+    if websocketclientPlayers.Connected = True then
+    begin
+      websocketclientPlayers.Send(ParseCommand('playerlist'));
+    end;
+  end
+  else
+    ShowMessage('ERROR: No IP or password set.');
+end;
+
+procedure TfrmMain.btnRemoveSavedCommandClick(Sender: TObject);
+begin
+  if lstSavedCommands.ItemIndex > -1 then
+    lstSavedCommands.Items.Delete(lstSavedCommands.ItemIndex);
+
+  lstSavedCommands.Items.SaveToFile(WEBRCON_SAVEDCOMMANDS);
+end;
+
+procedure TfrmMain.btnAddSavedCommandClick(Sender: TObject);
+var
+  new: string;
+begin
+  new := InputBox('New Command', 'Enter a new command to add', '');
+  if lstSavedCommands.Items.IndexOf(new) > -1 then
+    ShowMessage('Command Exists!')
+  else
+    lstSavedCommands.Items.Add(new);
+
+  lstSavedCommands.Items.SaveToFile(WEBRCON_SAVEDCOMMANDS);
+end;
+
+procedure TfrmMain.btnOpenDescriptionEditorClick(Sender: TObject);
+begin
+  frmDescriptionEditor.StyleBook := ActiveStyle;
+  frmDescriptionEditor.ShowModal;
+end;
+
+procedure TfrmMain.btnWebRconConnectClick(Sender: TObject);
+begin
+  if not (Trim(edtWebRconIP.Text) = Null) or (Trim(edtWebRconPassword.Text) = Null) then
+  begin
+    websocketclientRcon.Connect('ws://' + edtWebRconIP.Text + '/' + edtWebRconPassword.Text);
+  end
+  else
+    ShowMessage('ERROR: No IP or password set.');
+end;
+
+procedure TfrmMain.btnWebRconDisconnectClick(Sender: TObject);
+begin
+  websocketclientRcon.Disconnect;
+end;
+
+procedure TfrmMain.btnWebRconSendClick(Sender: TObject);
+begin
+  WebRconSend(edtWebRconSend.Text);
+  edtWebRconSend.Text := '';
+end;
+
+procedure TfrmMain.btnWebRcon_SaveConnectionClick(Sender: TObject);
+begin
+  try
+    SaveSettingString('WebRcon', 'IP', edtWebRconIP.Text);
+    SaveSettingString('WebRcon', 'Password', edtWebRconPassword.Text);
+  except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TfrmMain.cbbFormQualityChange(Sender: TObject);
+begin
+  case cbbFormQuality.ItemIndex of
+    0:
+      frmMain.Quality := TCanvasQuality.HighPerformance;
+    1:
+      frmMain.Quality := TCanvasQuality.HighQuality;
+    2:
+      frmMain.Quality := TCanvasQuality.SystemDefault;
+  end;
+end;
+
+procedure TfrmMain.cbbStylesChange(Sender: TObject);
+begin
+  case cbbStyles.ItemIndex of
+    0:
+      frmMain.StyleBook := DataModule1.stylebookBlackPearl;
+    1:
+      frmMain.StyleBook := DataModule1.stylebookOxfordBlue;
+    2:
+      frmMain.StyleBook := DataModule1.stylebookMadisonDark;
+  end;
+
+  ActiveStyle := frmMain.StyleBook;
+end;
+
+procedure TfrmMain.chkAutoScrollChange(Sender: TObject);
+begin
+  try
+    SaveSettingBool('WebRcon', 'AutoScroll', chkAutoScroll.IsChecked);
+  except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TfrmMain.chkSendOnEnterChange(Sender: TObject);
+begin
+  try
+    SaveSettingBool('WebRcon', 'SendOnEnter', chkSendOnEnter.IsChecked);
+  except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TfrmMain.chkWordWrapChange(Sender: TObject);
+begin
+  mmoWebRcon.WordWrap := chkWordWrap.IsChecked;
+  try
+    SaveSettingBool('WebRcon', 'WordWrap', chkWordWrap.IsChecked);
+  except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TfrmMain.Cleanup;
+begin
+  // WebSockets
+  if websocketclientRcon.Connected = True then
+    websocketclientRcon.Disconnect;
+
+end;
+
+procedure TfrmMain.edtWebRconSendKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if chkSendOnEnter.IsChecked then
+  begin
+    if Key = 13 then
+    begin
+      WebRconSend(edtWebRconSend.Text);
+      edtWebRconSend.Text := '';
+      Key := 0;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Cleanup;
+end;
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  Application.Title := 'RSM FMX';
+  lst1.ItemIndex := 0;
+  LoadAllSettings;
+end;
+
+procedure TfrmMain.GetPlayers(Data: string);
+var
+  users, user: TJSON;
+  I: Integer;
+  ListBoxGroupHeader: TListBoxGroupHeader;
+begin
+  users := TJSON.Parse(Data);
+  try
+    lstPlayers.Items.Clear;
+
+    for I := 1 to 6 do
+    begin
+      ListBoxGroupHeader := TListBoxGroupHeader.Create(lstPlayers);
+      ListBoxGroupHeader.Text := PLAYER_HEADERS[I];
+      ListBoxGroupHeader.TextSettings.HorzAlign := TTextAlign.Center;
+      lstPlayers.AddObject(ListBoxGroupHeader);
+    end;
+
+    for user in users do
+    begin
+      lstPlayers.Items.Add(user['DisplayName'].AsString);
+      lstPlayers.Items.Add(user['SteamID'].AsString);
+      lstPlayers.Items.Add(user['Address'].AsString);
+      lstPlayers.Items.Add(user['ConnectedSeconds'].AsString + ' Seconds');
+      lstPlayers.Items.Add(user['Ping'].AsString + ' ms');
+      lstPlayers.Items.Add('HP: ' + user['Health'].AsString);
+    end;
+
+  finally
+    users.Free;
+  end;
+end;
+
+procedure TfrmMain.GetRustDevblog;
+var
+  http: TIdHTTP;
+  jsonText: string;
+  json, blogs, blog: TJSON;
+  ListBoxItem: TListBoxItem;
+begin
+  lstDevBlog.Clear;
+  http := TIdHTTP.Create(Self);
+  try
+    jsonText := http.Get('http://api.facepunch.com/api/public/manifest/?public_key=j0VF6sNnzn9rwt9qTZtI02zTYK8PRdN1');
+    http.Free;
+  except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+
+  json := TJSON.Parse(jsonText);
+  try
+    jsonText := json['Title'].AsString;
+
+    blogs := TJSON.Parse(jsonText);
+    try
+      for blog in blogs['Blogs'] do
+      begin
+        ListBoxItem := TListBoxItem.Create(lstDevBlog);
+        ListBoxItem.ItemData.Text := blog['Title'].AsString;
+        ListBoxItem.ItemData.Detail := blog['SummaryHtml'].AsString;
+        lstDevBlog.AddObject(ListBoxItem);
+      end;
+    except
+      on E: Exception do
+        ShowMessage(E.Message);
+    end;
+
+  finally
+    json.Free;
+    blogs.Free;
+  end;
+
+end;
+
+procedure TfrmMain.LoadAllSettings;
+begin
+  // WebRcon
+  edtWebRconIP.Text := LoadSettingString('WebRcon', 'IP', '');
+  edtWebRconPassword.Text := LoadSettingString('WebRcon', 'Password', '');
+  chkAutoScroll.IsChecked := LoadSettingBool('WebRcon', 'AutoScroll', True);
+  chkSendOnEnter.IsChecked := LoadSettingBool('WebRcon', 'SendOnEnter', True);
+  chkWordWrap.IsChecked := LoadSettingBool('WebRcon', 'WordWrap', True);
+  if FileExists(WEBRCON_SAVEDCOMMANDS) then
+    lstSavedCommands.Items.LoadFromFile(WEBRCON_SAVEDCOMMANDS);
+end;
+
+function TfrmMain.LoadSettingBool(Section, Name: string; Value: Boolean): Boolean;
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    Result := ini.ReadBool(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+function TfrmMain.LoadSettingFloat(Section, Name: string; Value: Real): Real;
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    Result := ini.ReadFloat(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+function TfrmMain.LoadSettingInteger(Section, Name: string; Value: Integer): Integer;
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    Result := ini.ReadInteger(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+function TfrmMain.LoadSettingString(Section, Name, Value: string): string;
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    Result := ini.ReadString(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TfrmMain.LogRcon(LogText: string);
+begin
+  mmoWebRcon.Lines.Add('[' + DateTimeToStr(Now) + '] ' + LogText);
+
+  if chkAutoScroll.IsChecked then
+    mmoWebRcon.GoToTextEnd;
+end;
+
+procedure TfrmMain.lst1Change(Sender: TObject);
+begin
+  if lst1.ItemIndex = 0 then
+  begin
+    layoutServerConfig.Visible := True;
+    layoutServerInstaller.Visible := False;
+    layoutPluginManager.Visible := False;
+    layoutSettings.Visible := False;
+    layoutWebRcon.Visible := False;
+  end
+  else if lst1.ItemIndex = 1 then
+  begin
+    layoutServerConfig.Visible := False;
+    layoutServerInstaller.Visible := True;
+    layoutPluginManager.Visible := False;
+    layoutSettings.Visible := False;
+    layoutWebRcon.Visible := False;
+  end
+  else if lst1.ItemIndex = 2 then
+  begin
+    layoutServerConfig.Visible := False;
+    layoutServerInstaller.Visible := False;
+    layoutPluginManager.Visible := True;
+    layoutSettings.Visible := False;
+    layoutWebRcon.Visible := False;
+  end
+  else if lst1.ItemIndex = 3 then
+  begin
+    layoutServerConfig.Visible := False;
+    layoutServerInstaller.Visible := False;
+    layoutPluginManager.Visible := False;
+    layoutSettings.Visible := False;
+    layoutWebRcon.Visible := True;
+  end
+  else if lst1.ItemIndex = 4 then
+  begin
+    layoutServerConfig.Visible := False;
+    layoutServerInstaller.Visible := False;
+    layoutPluginManager.Visible := False;
+    layoutSettings.Visible := True;
+    layoutWebRcon.Visible := False;
+  end;
+end;
+
+procedure TfrmMain.lstSavedCommandsDblClick(Sender: TObject);
+begin
+  if lstSavedCommands.ItemIndex > -1 then
+    WebRconSend(lstSavedCommands.Items[lstSavedCommands.ItemIndex]);
+end;
+
+procedure TfrmMain.mmoWebRconChange(Sender: TObject);
+begin
+  if mmoWebRcon.Lines.Count > 200 then
+  begin
+    mmoWebRcon.Lines.Delete(0);
+    Application.ProcessMessages;
+    mmoWebRcon.GoToTextEnd;
+  end;
+end;
+
+procedure TfrmMain.websocketclientPlayersConnected(Sender: TObject; StatusCode: Integer; const Description: string);
+begin
+  btnRefreshPlayers.Enabled := False;
+end;
+
+procedure TfrmMain.websocketclientPlayersDataIn(Sender: TObject; DataFormat: Integer; Text: string; EOM: Boolean);
+begin
+  GetPlayers(ParseData(Text));
+  tmrWebSockerPlayersDC.Enabled := True;
+end;
+
+procedure TfrmMain.websocketclientPlayersDisconnected(Sender: TObject; StatusCode: Integer; const Description: string);
+begin
+  btnRefreshPlayers.Enabled := True;
+end;
+
+procedure TfrmMain.websocketclientRconConnectionStatus(Sender: TObject; const ConnectionEvent: string; StatusCode: Integer; const Description: string);
+begin
+  LogRcon(ConnectionEvent);
+  LogRcon(Description);
+end;
+
+procedure TfrmMain.websocketclientRconDataIn(Sender: TObject; DataFormat: Integer; Text: string; EOM: Boolean);
+var
+  Data: string;
+begin
+  if chkWebRconDebugMode.IsChecked = True then
+  begin
+    mmoWebRcon.Lines.Add(Text);
+  end
+  else
+  begin
+    Data := ParseData(Text);
+    LogRcon(Data);
+  end;
+end;
+
+procedure TfrmMain.websocketclientRconError(Sender: TObject; ErrorCode: Integer; const Description: string);
+begin
+  LogRcon(Description);
+end;
+
+function TfrmMain.ParseCommand(Command: string): string;
+begin
+  Result := '{' + '"Message": "' + Command + '",' + ' "Identifier": 0,' + '"Type": "Generic",' + '"Stacktrace": ""' + '}';
+end;
+
+function TfrmMain.ParseData(Data: string): string;
+var
+  Text: TJSON;
+  chat2: TJSON;
+  chat: string;
+begin
+  Text := TJSON.Parse(Data);
+  if (Text['Type'].AsString = 'Generic') or (Text['Type'].AsString = 'Error') or (Text['Type'].AsString = 'Warning') then
+  begin
+    Result := Text['Message'].AsString;
+    Text.Free;
+  end
+  else if Text['Type'].AsString = 'Chat' then
+  begin
+    chat := Text['Message'].AsString;
+    chat2 := TJSON.Parse(chat);
+    Result := chat2['Username'].AsString + ': ' + chat2['Message'].AsString;
+    chat2.Free;
+  end;
+end;
+
+procedure TfrmMain.SaveSettingBool(Section, Name: string; Value: Boolean);
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    ini.WriteBool(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TfrmMain.SaveSettingFloat(Section, Name: string; Value: Real);
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    ini.WriteFloat(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TfrmMain.SaveSettingInteger(Section, Name: string; Value: Integer);
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    ini.WriteInteger(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TfrmMain.SaveSettingString(Section, Name, Value: string);
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(RSM_CONFIG_FILE);
+  try
+    ini.WriteString(Section, Name, Value);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TfrmMain.tmrWebSockerPlayersDCTimer(Sender: TObject);
+begin
+  websocketclientPlayers.Disconnect;
+  tmrWebSockerPlayersDC.Enabled := False;
+end;
+
+procedure TfrmMain.WebRconSend(Command: string);
+begin
+  if websocketclientRcon.Connected = True then
+    websocketclientRcon.Send(ParseCommand(Command))
+  else
+    ShowMessage('WebRcon not connected!');
+end;
+
+end.
+

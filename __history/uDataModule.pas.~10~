@@ -1,0 +1,30 @@
+unit uDataModule;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FMX.Types, FMX.Controls, System.ImageList,
+  FMX.ImgList;
+
+type
+  TDataModule1 = class(TDataModule)
+    stylebookOxfordBlue: TStyleBook;
+    imgListNavBar: TImageList;
+    stylebookBlackPearl: TStyleBook;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DataModule1: TDataModule1;
+  ActiveServer: string;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,12 @@
+object frmDescriptionEditor: TfrmDescriptionEditor
+  Left = 0
+  Top = 0
+  Caption = 'Description Editor'
+  ClientHeight = 480
+  ClientWidth = 640
+  StyleBook = DataModule1.stylebookBlackPearl
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+end

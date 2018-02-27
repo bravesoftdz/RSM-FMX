@@ -1,0 +1,18 @@
+program RSM;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  uMain in 'uMain.pas' {frmMain},
+  uDataModule in 'uDataModule.pas' {DataModule1: TDataModule},
+  uDescriptionEditor in 'dialogs\uDescriptionEditor.pas' {Form1};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

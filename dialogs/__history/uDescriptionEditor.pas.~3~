@@ -1,0 +1,24 @@
+unit uDescriptionEditor;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, uDataModule;
+
+type
+  TfrmDescriptionEditor = class(TForm)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmDescriptionEditor: TfrmDescriptionEditor;
+
+implementation
+
+{$R *.fmx}
+
+end.
